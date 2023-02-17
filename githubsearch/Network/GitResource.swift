@@ -2,10 +2,7 @@ import Foundation
 import UIKit
 
 protocol GitProtocol{
-    func getUserRepoDetails(url: String, completion: @escaping(Result<[ReposListDataResponse],UserError>) -> Void)
-    func getUserDetails(url: String, completion: @escaping(Result<UserDataModelResponse,UserError>) -> Void)
-    func getUsersListData(searchQuery: String, PageNumber: Int, completion: @escaping(Result<SearchUserDataModel,UserError>) -> Void)
-    func getReposListData(searchQuery: String, PageNumber: Int, completion: @escaping(Result<SearchRepositoryDataModel, UserError>) -> Void)
+    func fetch<T: Decodable>(from urlString: String, resultType: T.Type, completion: @escaping (Result<T, UserError>) -> Void)
 }
 
 struct GitResource: GitProtocol {
@@ -18,72 +15,12 @@ struct GitResource: GitProtocol {
         self.httpUtility = httpUtility
     }
 
-
-    func getUserRepoDetails(url: String, completion: @escaping (Result<[ReposListDataResponse], UserError>) -> Void) {
-        guard let url = URL(string: url) else {
+    func fetch<T>(from urlString: String, resultType: T.Type, completion: @escaping (Result<T, UserError>) -> Void) where T : Decodable {
+        guard let url = URL(string: urlString) else {
             completion(.failure(.InvalidURL))
             return
         }
-        httpUtility.performDataTask(url: url, resultType: [ReposListDataResponse].self) { result in
-            switch result {
-            case .success(let jsonData):
-                DispatchQueue.main.async {
-                    completion(.success(jsonData))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func getUserDetails(url: String, completion: @escaping (Result<UserDataModelResponse, UserError>) -> Void) {
-        guard let url = URL(string: url) else {
-            completion(.failure(.InvalidURL))
-            return
-        }
-        httpUtility.performDataTask(url: url, resultType: UserDataModelResponse.self) { result in
-            switch result {
-            case .success(let jsonData):
-                DispatchQueue.main.async {
-                    completion(.success(jsonData))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func getUsersListData(searchQuery: String, PageNumber: Int, completion: @escaping (Result<SearchUserDataModel, UserError>) -> Void) {
-        guard let url = URL(string: userUrlString + searchQuery + "&page=" + String(PageNumber)) else {
-            completion(.failure(.InvalidURL))
-            return
-        }
-        httpUtility.performDataTask(url: url, resultType: SearchUserDataModel.self) { result in
-            switch result {
-            case .success(let jsonData):
-                DispatchQueue.main.async {
-                    completion(.success(jsonData))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-
-    func getReposListData(searchQuery: String, PageNumber: Int, completion: @escaping(Result<SearchRepositoryDataModel, UserError>) -> Void){
-        guard let url = URL(string: repoUrlString + searchQuery + "&page=" + String(PageNumber)) else {
-            completion(.failure(.InvalidURL))
-            return
-        }
-        httpUtility.performDataTask(url: url, resultType: SearchRepositoryDataModel.self) { result in
-            switch result {
-            case .success(let jsonData):
-                DispatchQueue.main.async {
-                    completion(.success(jsonData))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        
+        httpUtility.performDataTask(url: url, resultType: resultType, completion: completion)
     }
 }

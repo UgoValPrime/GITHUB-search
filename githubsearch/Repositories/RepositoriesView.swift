@@ -17,10 +17,9 @@ struct RepositoriesView: View {
         )
 
         listView
-
-        Spacer()
       }
-      .padding()
+      .padding(.leading)
+      .padding(.trailing)
       .errorAlert(error: $viewModel.error)
       
     }

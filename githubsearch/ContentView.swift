@@ -9,7 +9,7 @@ struct ContentView: View {
         TabView(selection: $tabSelection) {
             HomeView(tabSelection: $tabSelection)
           .tabItem {
-            Label("Home", image: "home")
+            Label("Home", image: "Home")
           }.tag(1)
 
         RepositoriesView()
@@ -22,6 +22,11 @@ struct ContentView: View {
             Label("Users", image: "profile")
           }.tag(3)
       }
+        .onAppear {
+                   let tabBarAppearance = UITabBarAppearance()
+                   UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                   tabBarAppearance.backgroundColor = .systemBackground
+               }
     }
 }
 

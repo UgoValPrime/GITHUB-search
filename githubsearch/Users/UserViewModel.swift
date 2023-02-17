@@ -4,81 +4,100 @@ import Foundation
 final class UserViewModel: ObservableObject {
     @Published var user: [UserDataModelResponse] = []
     @Published var userRepos: [ReposListDataResponse] = []
-    @Published var scantyUser:  [SearchUserDataModelResponse] = []
+    @Published var scantyUser:  [SearchUserDataModelResponse]?
+    @Published var tempUser: [UserDataModelResponse] = []
     @Published var searchText: String = ""
-    @Published var userUrl: String = ""
-    @Published var repoUrl: String = ""
+    @Published var totalCount: Int?
+    var pageNumber : Int = 1
     
     @Published var error: LocalizedError?
     @Published var subError: LocalizedError?
 
     var gitResource: GitProtocol?
-    var pageNumber : Int?
 
     init(gitResource: GitProtocol = GitResource()) {
         self.gitResource = gitResource
     }
     
     
-    
-    
     func getUserRepoDetails(_ url: String) {
-        gitResource?.getUserRepoDetails(url: url ) { [weak self] result in
+        
+        gitResource?.fetch(from: url, resultType: [ReposListDataResponse].self, completion: { [weak self]  result in
             switch result {
             case .success(let listOf):
-                let val = listOf
-                self?.userRepos = val
+               
+                DispatchQueue.main.async {
+                    let val = listOf
+                    self?.userRepos = val
+                }
+              
             case .failure(let error):
                 DispatchQueue.main.async {
                     self?.subError = error
                 }
                 print("Error processing json data for repo: \(error.localizedDescription)")
             }
-        }
+        })
     }
     
     func getUsersDetails(_ url: String) {
-        gitResource?.getUserDetails(url: url) { [weak self] result in
+        print("the api to hit", url)
+        
+        gitResource?.fetch(from: url, resultType: UserDataModelResponse.self, completion: { [weak self]  result in
             switch result {
             case .success(let listOf):
-                
-                let val = listOf
-                if self?.user.count ?? 0 >= self?.scantyUser.count ?? 0 {
-                    self?.user.removeAll()
-                    self?.user.append(val)
-                }else{
-                    self?.user.append(val)
+               
+                DispatchQueue.main.async {
+                    let val = listOf
+                    if self?.tempUser.count ?? 0 >= self?.scantyUser?.count ?? 0 {
+                        self?.tempUser.removeAll()
+                        self?.tempUser.append(val)
+                        self?.user = self?.tempUser ?? []
+                    }else{
+                        self?.tempUser.append(val)
+                        self?.user = self?.tempUser ?? []
+                    }
                 }
+              
             case .failure(let error):
                 DispatchQueue.main.async {
                     self?.subError = error
                 }
-                print("Error processing json data: \(error.localizedDescription)")
+                print("Error processing json data for user: \(error.localizedDescription)")
             }
-        }
+        })
     }
 
 
     func getUsersListData() {
-        gitResource?.getUsersListData(searchQuery: self.searchText, PageNumber: self.pageNumber ?? 1) { [weak self] result in
+        let queryItems = [URLQueryItem(name: "q", value: searchText), URLQueryItem(name: "page", value: String(pageNumber ?? 1))]
+        var urlComps = URLComponents(string: "\(API.baseUrl)\(API.userPath)")!
+        urlComps.queryItems = queryItems
+        let result = urlComps.url!
+        let url = result.absoluteString
+        
+        gitResource?.fetch(from: url, resultType: SearchUserDataModel.self, completion: { [weak self]  result in
             switch result {
             case .success(let listOf):
-                self?.scantyUser = listOf.items
-                for item in listOf.items {
-                    self?.getUsersDetails(item.url ?? "google.com")
-                    self?.getUserRepoDetails(item.reposURL ?? "google.com")
+               
+                DispatchQueue.main.async {
+                    self?.totalCount = listOf.totalCount
+                    self?.scantyUser = listOf.items
+                    for item in self!.scantyUser! {
+                        self?.getUsersDetails(item.url ?? "google.com")
+                        self?.getUserRepoDetails(item.reposURL ?? "google.com")
+                    }
                 }
-            
+              
             case .failure(let error):
-                
                 DispatchQueue.main.async {
                     self?.user = []
                     self?.error = error
                 }
-                
-                print("Error processing json data: \(error.localizedDescription)")
+                print("Error processing json data for details: \(error.localizedDescription)")
             }
+        })
         }
     }
-}
+
 

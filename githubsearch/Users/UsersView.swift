@@ -17,12 +17,10 @@ struct UsersView: View {
                     placeholder: "Search for users",
                     searchAction: {viewModel.getUsersListData() }
                 )
-                
                 listView
-                
-                Spacer()
             }
-            .padding()
+            .padding(.leading)
+            .padding(.trailing)
             .errorAlert(error: $viewModel.error)
         }
     }
@@ -30,28 +28,20 @@ struct UsersView: View {
     var listView: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack {
-                if let user = viewModel.user {
+                
+                if viewModel.scantyUser?.count == 0 {
+                    EmptyState(message: "We’ve searched the ends of the earth and we’ve not found this user, please try again",
+                               imageName: "emptySearch")
+                } else if viewModel.user.count == 0 {
+                    EmptyState(message: "Search Github for users...", imageName: "emptySearch")
+                } else if let user = viewModel.user {
                     ForEach(user, id: \.id) { user in
                         NavigationLink(destination: UserDetailView(viewModel: viewModel, user: user)) {
                             UsersCardView(users: user)
                         }
                     }
-                } else if viewModel.user.count < 1{
-                    EmptyState(message: "We’ve searched the ends of the earth and we’ve not found this user, please try again", imageName: "emptySearch")  // any idea why this isnt working??
-                }else {
-                    EmptyState(message: "Search Github for users...", imageName: "emptySearch")
                 }
             }
-        }
-    }
-    var emptyState: some View {
-        VStack(spacing: 30) {
-            Spacer()
-            Image("emptySearch")
-            
-            Text("Search Github for users...")
-                .multilineTextAlignment(.center)
-            Spacer()
         }
     }
 }

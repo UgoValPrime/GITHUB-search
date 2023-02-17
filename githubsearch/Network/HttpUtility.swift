@@ -22,18 +22,21 @@ public struct HTTPUtility: UtilityService {
                 return
             }
             URLSession.shared.dataTask(with: url) { (data, response, error) in
-                guard data != nil else {
+                guard error == nil else {
+                
                     completion(.failure(.NoDataAvailable))
                     return
                 }
 
                 guard let response = response
                         as? HTTPURLResponse, (200..<210).contains(response.statusCode) else {
+                    print("the reason for the crash>>>>\(response)")
                     completion(.failure(.CannotProcessData))
                     return
                 }
 
                 guard let data = data else {
+                    print("the reason for the crashhh>>>>\(data)")
                     completion(.failure(.NoDataAvailable))
                     return
                 }

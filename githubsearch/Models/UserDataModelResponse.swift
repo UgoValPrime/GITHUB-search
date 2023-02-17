@@ -18,10 +18,13 @@ struct UserDataModelResponse: Codable, Identifiable {
     let name, company: String?
     let blog: String?
     let location: String?
-    let email, hireable: String?
+    let email: String?
     let bio, twitterUsername: String?
     let publicRepos, publicGists, followers, following: Int?
     let createdAt, updatedAt: String?
+
+    
+    
 
     enum CodingKeys: String, CodingKey {
         case login, id
@@ -41,7 +44,7 @@ struct UserDataModelResponse: Codable, Identifiable {
         case receivedEventsURL = "received_events_url"
         case type
         case siteAdmin = "site_admin"
-        case name, company, blog, location, email, hireable, bio
+        case name, company, blog, location, email, bio
         case twitterUsername = "twitter_username"
         case publicRepos = "public_repos"
         case publicGists = "public_gists"
