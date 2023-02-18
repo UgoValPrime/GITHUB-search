@@ -75,7 +75,7 @@ final class UserViewModel: ObservableObject {
 
 
     func getUsersListData() {
-        let queryItems = [URLQueryItem(name: "q", value: searchText), URLQueryItem(name: "page", value: String(pageNumber ?? 1))]
+        let queryItems = [URLQueryItem(name: "q", value: searchText), URLQueryItem(name: "page", value: String(pageNumber ))]
         var urlComps = URLComponents(string: "\(API.baseUrl)\(API.userPath)")!
         urlComps.queryItems = queryItems
         let result = urlComps.url!
@@ -91,7 +91,6 @@ final class UserViewModel: ObservableObject {
                     self?.scantyUser = listOf.items
                     for item in self!.scantyUser! {
                         self?.getUsersDetails(item.url ?? "google.com")
-                        self?.getUserRepoDetails(item.reposURL ?? "google.com")
                     }
                 }
               

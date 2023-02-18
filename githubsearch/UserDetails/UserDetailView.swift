@@ -98,8 +98,10 @@ struct UserDetailView: View {
 
       ScrollView(.vertical, showsIndicators: false) {
         LazyVStack {
+            let _ = viewModel.getUserRepoDetails(user.reposURL ?? "")
             if let repo = viewModel.userRepos {
                 ForEach(repo, id: \.id) { repo in
+                
                     UserDetailCardView(userRepos: repo)
                 }
             }else{
