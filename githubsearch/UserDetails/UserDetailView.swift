@@ -10,7 +10,6 @@ struct UserDetailView: View {
         
       VStack(alignment: .leading, spacing: 15) {
           
-          
         titleView
 
           Text("This is a random bio, which will be replace with actual content").font(.appSBMediumFont)

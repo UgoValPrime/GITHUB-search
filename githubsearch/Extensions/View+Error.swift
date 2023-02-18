@@ -9,7 +9,7 @@ struct LocalizedAlertError: LocalizedError {
           
           return NSLocalizedString("No internet", comment: "No internet")
       }else if (underlyingError.localizedDescription == "The operation couldn’t be completed. (githubsearch.UserError error 1.)"){
-          return NSLocalizedString("Error Proccessing Data ", comment: "My error")
+          return NSLocalizedString("Client error", comment: "My error")
       }else if (underlyingError.localizedDescription == "The operation couldn’t be completed. (githubsearch.UserError error 2.)"){
           return NSLocalizedString("No data", comment: "My error")
       }
@@ -22,7 +22,7 @@ struct LocalizedAlertError: LocalizedError {
           return NSLocalizedString("Seems you have network issue. Please check and try again", comment: "No internet")
       }else if (underlyingError.localizedDescription == "The operation couldn’t be completed. (githubsearch.UserError error 1.)"){
           
-          return NSLocalizedString("Sorry we couldn't decode the data coming through", comment: "My error")
+          return NSLocalizedString("you do not have access", comment: "My error")
       }else if (underlyingError.localizedDescription == "The operation couldn’t be completed. (githubsearch.UserError error 2.)"){
           return NSLocalizedString("Seems there isn't any data coming through", comment: "My error")
       }

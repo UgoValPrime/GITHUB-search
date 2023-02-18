@@ -9,6 +9,7 @@ final class UserViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var totalCount: Int?
     var pageNumber : Int = 1
+    var errCount: Int = 0
     
     @Published var error: LocalizedError?
     @Published var subError: LocalizedError?
@@ -33,7 +34,11 @@ final class UserViewModel: ObservableObject {
               
             case .failure(let error):
                 DispatchQueue.main.async {
-                    self?.subError = error
+                    if self?.errCount ?? 0 < 2 {
+                        self?.user = []
+                        self?.error = error
+                    }
+                    self?.errCount += 1
                 }
                 print("Error processing json data for repo: \(error.localizedDescription)")
             }
@@ -81,6 +86,7 @@ final class UserViewModel: ObservableObject {
             case .success(let listOf):
                
                 DispatchQueue.main.async {
+                    self?.errCount = 0
                     self?.totalCount = listOf.totalCount
                     self?.scantyUser = listOf.items
                     for item in self!.scantyUser! {
